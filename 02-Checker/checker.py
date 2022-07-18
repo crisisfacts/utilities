@@ -79,9 +79,16 @@ if requestId_check:
         for day in this_event:
             valid_requests.add(day["requestID"])
 
+    # Keep track of the request IDs we've seen in the submission file
+    found_requests = set()
+
     # Iterate through all elements in the submission, and ensure request IDs are valid
     for line_num, element in enumerate(checkable_data):
         assert element["requestID"] in valid_requests, "ERROR Line [%d]: Invalid request ID [%s]" % (line_num, element["requestID"])
+        found_requests.add(element["requestID"])
+
+    missing_requests = valid_requests.difference(found_requests)
+    assert len(missing_requests) == 0, "ERROR: Submission file is missing responses for the following requests: " + ",".join(missing_requests)
 
     print("RequestID Check: Pass")
 
