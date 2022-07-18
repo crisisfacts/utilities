@@ -3,29 +3,29 @@
 import sys
 import json
 
+# Configure which checks to run
+#  NOTE: Format checking always happens
+requestId_check = True
 
+# Check we have arguments to parse
 if len(sys.argv) < 2:
     print("Usage: %s <run_file_to_check.json>" % sys.argv[0], file=sys.stderr)
     sys.exit(-1)
 
-
+# Get the file to check
 in_file_path = sys.argv[1]
 print("Checking file: [%s]" % in_file_path)
 
-# class Fact:
-#     requestID : str
-#     factText : str
-#     unixTimestamp : int
-#     importance : float
-#     sources : List[str] = []
-#     streamID : str
-#     informationNeeds: [] = []
 
-
+# Reach in our submission file
 checkable_data = None
 with open(in_file_path, "r") as in_file:
     checkable_data = json.load(in_file)
 
+
+# *****************************************************************************
+# Check format, always happens
+# *****************************************************************************
 for line_num, element in enumerate(checkable_data):
 
     # String types
@@ -49,10 +49,46 @@ for line_num, element in enumerate(checkable_data):
     if element["informationNeeds"] is not None:
         assert type(element["informationNeeds"]) == list, "ERROR, Line [%d]: informationNeeds type is not list" % line_num
 
+print("Format Check: Pass")
 
-# TODO: Validate requestID is in the set of requests
+# *****************************************************************************
+# Validate requestID is in the set of requests
+# *****************************************************************************
+if requestId_check:
+    import requests
+
+    # Event numbers as a list
+    event_list = [
+        "001", # Lilac Wildfire 2017
+        "002", # Cranston Wildfire 2018
+        "003", # Holy Wildfire 2018
+        "004", # Hurricane Florence 2018
+        "005", # 2018 Maryland Flood
+        "006", # Saddleridge Wildfire 2019
+        "007", # Hurricane Laura 2020
+        "008" # Hurricane Sally 2020
+    ]
+
+    valid_requests = set()
+    for event_number in event_list:
+        # We will download a file containing the day list for an event
+        url = "http://trecis.org/CrisisFACTs/CrisisFACTS-"+event_number+".requests.json"
+
+        # Download the list and parse as JSON
+        this_event = requests.get(url).json()
+        for day in this_event:
+            valid_requests.add(day["requestID"])
+
+    # Iterate through all elements in the submission, and ensure request IDs are valid
+    for line_num, element in enumerate(checkable_data):
+        assert element["requestID"] in valid_requests, "ERROR Line [%d]: Invalid request ID [%s]" % (line_num, element["requestID"])
+
+    print("RequestID Check: Pass")
+
+
+
 # TODO: Validate importance is reasonable
 # TODO: Validate elements in sources and information needs are reasonable
 
 
-print("Success! No errors found.")
+print("Success! Passed all tests.")
