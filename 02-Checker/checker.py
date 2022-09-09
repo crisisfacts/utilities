@@ -20,7 +20,8 @@ print("Checking file: [%s]" % in_file_path)
 # Reach in our submission file
 checkable_data = None
 with open(in_file_path, "r") as in_file:
-    checkable_data = json.load(in_file)
+    checkable_data = [json.loads(line) for line in in_file]
+
 
 
 # *****************************************************************************
