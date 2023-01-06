@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Lilac Wildfire 2017",
+    "trecisID": "TRECIS-CTIT-H-092",
+    "eventID": "CrisisFACTS-001",
+    "icsID": "2017_7418460_LILAC 5"
+  },
+  {
+    "title": "Cranston Wildfire 2018",
+    "trecisID": "TRECIS-CTIT-H-095",
+    "eventID": "CrisisFACTS-002",
+    "icsID": "2018_9217623_CRANSTON"
+  },
+  {
+    "title": "Holy Wildfire 2018",
+    "trecisID": "TRECIS-CTIT-H-097",
+    "eventID": "CrisisFACTS-003",
+    "icsID": "2018_9226396_HOLY"
+  },
+  {
+    "title": "Hurricane Florence 2018",
+    "trecisID": "TRECIS-CTIT-H-098",
+    "eventID": "CrisisFACTS-004",
+    "icsID": "2018_9085670_HURRICANE FLORENCE RESPONSE,2018_9247758_HURRICANE FLORENCE NC AG EOC,2018_9248081_HURRICANE FLORENCE,2018_9249225_HURRICANE FLORENCE GARNER RSOI"
+  },
+  {
+    "title": "2018 Maryland Flood",
+    "trecisID": "TRECIS-CTIT-H-101",
+    "eventID": "CrisisFACTS-005",
+    "icsID": "NONE"
+  },
+  {
+    "title": "Saddleridge Wildfire 2019",
+    "trecisID": "TRECIS-CTIT-H-106",
+    "eventID": "CrisisFACTS-006",
+    "icsID": "2019_10754067_SADDLERIDGE"
+  },
+  {
+    "title": "Hurricane Laura 2020",
+    "trecisID": "TRECIS-CTIT-H-113",
+    "eventID": "CrisisFACTS-007",
+    "icsID": "2020_11820062_KIF HURRICANE LAURA SUPPORT"
+  },
+  {
+    "title": "Hurricane Sally 2020",
+    "trecisID": "TRECIS-CTIT-H-114",
+    "eventID": "CrisisFACTS-008",
+    "icsID": "2020_11923560_HURRICANE SALLY FL STATE T1 RED IMT"
+  }
+]

@@ -1,0 +1,67 @@
+[
+	{
+		"eventID": "CrisisFACTS-001",
+		"trecisID": "TRECIS-CTIT-H-092",
+		"dataset": "2017_12_07_lilac_wildfire.2017",
+		"title": "Lilac Wildfire 2017",
+		"type": "Wildfire",
+		"url": "https://en.wikipedia.org/wiki/Lilac_Fire",
+		"description": "The Lilac Fire was a fire that burned in northern San Diego County, California, United States, and the second-costliest one of multiple wildfires that erupted in Southern California in December 2017."
+	},{
+		"eventID": "CrisisFACTS-002",
+		"trecisID": "TRECIS-CTIT-H-095",
+		"dataset": "2018_07_23_cranston_wildfire.2018",
+		"title": "Cranston Wildfire 2018",
+		"type": "Wildfire",
+		"url": "https://en.wikipedia.org/wiki/Cranston_Fire",
+		"description": "The Cranston Fire was a wildfire that burned in southwest Riverside County, California, in the United States. The fire was started on July 25, 2018 by Brandon M. McGlover, in an act of arson. The fire burned a total of 13,139 acres (53 km2), before it was fully contained on August 10."
+	},{
+		"eventID": "CrisisFACTS-003",
+		"trecisID": "TRECIS-CTIT-H-097",
+		"dataset": "2018_08_05_holy_wildfire.2018",
+		"title": "Holy Wildfire 2018",
+		"type": "Wildfire",
+		"url": "https://en.wikipedia.org/wiki/Holy_Fire_(2018)",
+		"description": "The Holy Fire was a wildfire that burned in the Cleveland National Forest in Orange and Riverside Counties, California."
+	},{
+		"eventID": "CrisisFACTS-004",
+		"trecisID": "TRECIS-CTIT-H-098",
+		"dataset": "2018_09_07_hurricane_florence.2018",
+		"title": "Hurricane Florence 2018",
+		"type": "Hurricane",
+		"url": "https://en.wikipedia.org/wiki/Hurricane_Florence",
+		"description": "Hurricane Florence was a powerful and long-lived Cape Verde hurricane that caused catastrophic damage in the Carolinas in September 2018, primarily as a result of freshwater flooding due to torrential rain."
+	},{
+		"eventID": "CrisisFACTS-005",
+		"trecisID": "TRECIS-CTIT-H-101",
+		"dataset": "2018_maryland_flood",
+		"title": "2018 Maryland Flood",
+		"type": "Flood",
+		"url": "https://en.wikipedia.org/wiki/2018_Maryland_flood",
+		"description": "In the afternoon of May 27, 2018, after over 8 inches (20 cm) of rain in a span of two hours, the historic Main Street in Ellicott City, Maryland was flooded, just before the new flood emergency alert system was supposed to become operational."
+	},{
+		"eventID": "CrisisFACTS-006",
+		"trecisID": "TRECIS-CTIT-H-106",
+		"dataset": "2019_10_10_saddleridge_wildfire.2019",
+		"title": "Saddleridge Wildfire 2019",
+		"type": "Wildfire",
+		"url": "https://en.wikipedia.org/wiki/Saddleridge_Fire",
+		"description": "The Saddleridge Fire was a wildfire burning near the San Fernando Valley of Los Angeles County, California. It broke out roughly around 9:02 pm on Thursday October 10, 2019."
+	},{
+		"eventID": "CrisisFACTS-007",
+		"trecisID": "TRECIS-CTIT-H-113",
+		"dataset": "2020_08_27_hurricane_laura.2020",
+		"title": "Hurricane Laura 2020",
+		"type": "Hurricane",
+		"url": "https://en.wikipedia.org/wiki/Hurricane_Laura",
+		"description": "Hurricane Laura was a deadly and destructive Category 4 hurricane that is tied with the 1856 Last Island hurricane as the strongest hurricane on record to make landfall in the U.S. state of Louisiana, as measured by maximum sustained winds."
+	},{
+		"eventID": "CrisisFACTS-008",
+		"trecisID": "TRECIS-CTIT-H-114",
+		"dataset": "2020_09_11_hurricane_sally.2020",
+		"title": "Hurricane Sally 2020",
+		"type": "Hurricane",
+		"url": "https://en.wikipedia.org/wiki/Hurricane_Sally",
+		"description": "Hurricane Sally was a destructive Atlantic hurricane which became the first hurricane to make landfall in the U.S. state of Alabama since Ivan in 2004, coincidentally on the same date in the same place. The eighteenth named storm, and seventh hurricane of the extremely active 2020 Atlantic hurricane season."
+	}
+]
