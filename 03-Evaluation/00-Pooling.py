@@ -5,8 +5,8 @@ import glob
 import gzip
 
 
-extractive_pool_depth = 128
-abstractive_pool_depth = 128
+extractive_pool_depth = 16
+abstractive_pool_depth = 16
 
 
 
@@ -64,7 +64,7 @@ def construct_pools(event_request_fact_list, pool_depth):
 #. We also merge facts based on their streamID to keep track of facts
 #. multiple systems have returned
 event_request_fact_list = {k:{} for k in event_request_fact_count_map.keys()}
-for f in glob.glob("to.pool.extractive/*.run*.json.gz"):
+for f in glob.glob("to.pool.extractive/*.json.gz"):
     
     this_run_id = f.partition("/")[-1].replace(".json.gz", "")
     print(f, "-->", this_run_id)
@@ -83,6 +83,9 @@ for f in glob.glob("to.pool.extractive/*.run*.json.gz"):
         
         this_event_request_k = event_request_fact_count_map[event_request]
         for this_top_fact in sorted_fact_list[:this_event_request_k]:
+
+            this_stream_id = this_top_fact["streamID"]
+            assert this_stream_id is not None
             
             event_request_stream_pool = event_request_fact_list[event_request].get(this_top_fact["streamID"], [])
             
@@ -113,7 +116,7 @@ with open("extractive_pools.depth=%d.json" % extractive_pool_depth, "w") as out_
 #. multiple systems have returned
 
 event_request_fact_list_abstractive = {k:{} for k in event_request_fact_count_map.keys()}
-for f in glob.glob("to.pool.abstractive/*.run*.json.gz"):
+for f in glob.glob("to.pool.abstractive/*.json.gz"):
     
     this_run_id = f.partition("/")[-1].replace(".json.gz", "")
     print(f, "-->", this_run_id)
