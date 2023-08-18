@@ -1,24 +1,49 @@
-#! /usr/bin/env python
+#!/runs/bin/venv/bin/python
 
 import sys
 import json
+
+import logging
 import argparse
+from pathlib import Path
 
 arg_parse = argparse.ArgumentParser(
     prog='checker.py',
-    description='CrisisFACTS Submission File Checker'
-)
-arg_parse.add_argument("filename", type=str, help="Path to submission file")
+    description='CrisisFACTS Submission File Checker',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+arg_parse.add_argument('--files', '-f',
+                       help='Location of requests files',
+                       default='/runs/aux/crisis')
 arg_parse.add_argument(
-    "--disable", 
-    type=str, 
+    "--disable",
+    type=str,
     choices=["requestIds", "importance", "queries", "sources"],
     default="",
     nargs='+',
     help="Which checks to disable"
 )
-
+arg_parse.add_argument('filename',
+                help='Run file to check')
 arguments = arg_parse.parse_args()
+
+logging.basicConfig(filename=f'{arguments.filename}.errlog',
+                    level=logging.DEBUG)
+
+# Catch assertion failures and log them to the errlog
+def excepthook(exctype, value, traceback):
+    if issubclass(exctype, AssertionError):
+        logging.getLogger().error(value)
+        sys.exit(255)
+    else:
+        sys.__excepthook__(exctype, value, traceback)
+
+sys.excepthook = excepthook
+
+def my_print(*args):
+    msg = " ".join(args)
+    logging.info(msg)
+
+print = my_print
 
 print("Format checking:", "enabled")
 
@@ -51,6 +76,8 @@ in_file_path = arguments.filename
 print("Checking file: [%s]" % in_file_path)
 
 
+
+
 # Reach in our submission file
 checkable_data = None
 with open(in_file_path, "r") as in_file:
@@ -64,23 +91,30 @@ with open(in_file_path, "r") as in_file:
 for line_num, element in enumerate(checkable_data):
 
     # String types
+    assert "requestID" in element, "ERROR, Line [%d]: requestID not in element" % line_num
+    assert "factText" in element, "ERROR, Line [%d]: factText not in element" % line_num
     assert type(element["requestID"]) == str, "ERROR, Line [%d]: requestID type is not str" % line_num
     assert type(element["factText"]) == str, "ERROR, Line [%d]: factText type is not str" % line_num
 
+    assert "streamID" in element
     assert "streamID" in element, "ERROR, Line [%d]: streamID  not in element" % line_num
     if element["streamID"] is not None:
         assert type(element["streamID"]) == str, "ERROR, Line [%d]: requestID type is not str" % line_num
-    
+
     # int types
+    assert "unixTimestamp" in element, "ERROR, Line [%d]: unixTimestamp not in element" % line_num
     assert type(element["unixTimestamp"]) == int, "ERROR, Line [%d]: unixTimestamp type is not int" % line_num
 
     # float types
+    assert "importance" in element, "ERROR, Line [%d]: importance not in element" % line_num
     assert type(element["importance"]) == float, "ERROR, Line [%d]: importance type is not float" % line_num
 
     # List types
+    assert "sources" in element, "ERROR, Line [%d]: sources not in element" % line_num
     assert type(element["sources"]) == list, "ERROR, Line [%d]: sources type is not list" % line_num
     assert len(element["sources"]) > 0, "ERROR, Line [%d]: sources must be non-empty" % line_num
 
+    assert "informationNeeds" in element, "ERROR, Line [%d]: informationNeeds not in element" % line_num
     if element["informationNeeds"] is not None:
         assert type(element["informationNeeds"]) == list, "ERROR, Line [%d]: informationNeeds type is not list" % line_num
 
@@ -90,7 +124,6 @@ print("Format Check: Pass")
 # Validate requestID is in the set of requests
 # *****************************************************************************
 if requestId_check:
-    import requests
 
     # Event numbers as a list
     event_list = [
@@ -116,11 +149,10 @@ if requestId_check:
 
     valid_requests = set()
     for event_number in event_list:
-        # We will download a file containing the day list for an event
-        url = "http://trecis.org/CrisisFACTs/CrisisFACTS-"+event_number+".requests.json"
+        file_loc = Path(arguments.files) / f'CrisisFACTS-{event_number}.requests.json'
 
-        # Download the list and parse as JSON
-        this_event = requests.get(url).json()
+        # Read in the list and parse as JSON
+        this_event = json.load(open(file_loc, 'r'))
         for day in this_event:
             valid_requests.add(day["requestID"])
 
@@ -138,8 +170,8 @@ if requestId_check:
         for missing_element in missing_requests:
             print("\t", missing_element)
 
-        entered = input("\nIs this acceptable? [Y/n] ")
-        assert entered.lower() == "y", "ERROR: Can't continue without user agreement"
+        # entered = input("\nIs this acceptable? [Y/n] ")
+        # assert entered.lower() == "y", "ERROR: Can't continue without user agreement"
 
 
     print("RequestID Check: Pass")
