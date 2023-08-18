@@ -39,6 +39,12 @@ def excepthook(exctype, value, traceback):
 
 sys.excepthook = excepthook
 
+def my_print(*args):
+    msg = " ".join(args)
+    logging.info(msg)
+
+print = my_print
+
 print("Format checking:", "enabled")
 
 requestId_check = True
