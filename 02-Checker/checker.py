@@ -1,19 +1,41 @@
-#! /usr/bin/env python
+#!/runs/bin/venv/bin/python
 
 import sys
 import json
+import logging
+import argparse
+from pathlib import Path
+
+ap = argparse.ArgumentParser(description='Check a CrisisFACTs run for correctness.',
+                             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+ap.add_argument('--files', '-f',
+                help='Location of requests files',
+                default='/runs/aux/crisis')
+ap.add_argument('--no_reqid_check',
+                action='store_false',
+                help='Should we skip the requestID check? (default: no)')
+ap.add_argument('runfile',
+                help='Run file to check')
+args = ap.parse_args()
 
 # Configure which checks to run
 #  NOTE: Format checking always happens
-requestId_check = True
+requestId_check = args.no_reqid_check
 
-# Check we have arguments to parse
-if len(sys.argv) < 2:
-    print("Usage: %s <run_file_to_check.json>" % sys.argv[0], file=sys.stderr)
-    sys.exit(-1)
+logging.basicConfig(filename=f'{args.runfile}.errlog',
+                    level=logging.DEBUG)
 
-# Get the file to check
-in_file_path = sys.argv[1]
+# Catch assertion failures and log them to the errlog
+def excepthook(exctype, value, traceback):
+    if issubclass(exctype, AssertionError):
+        logging.getLogger().error(value)
+        sys.exit(255)
+    else:
+        sys.__excepthook__(exctype, value, traceback)
+
+sys.excepthook = excepthook
+
+in_file_path = args.runfile
 print("Checking file: [%s]" % in_file_path)
 
 
@@ -36,7 +58,7 @@ for line_num, element in enumerate(checkable_data):
     assert "streamID" in element, "ERROR, Line [%d]: streamID  not in element" % line_num
     if element["streamID"] is not None:
         assert type(element["streamID"]) == str, "ERROR, Line [%d]: requestID type is not str" % line_num
-    
+
     # int types
     assert type(element["unixTimestamp"]) == int, "ERROR, Line [%d]: unixTimestamp type is not int" % line_num
 
@@ -56,7 +78,6 @@ print("Format Check: Pass")
 # Validate requestID is in the set of requests
 # *****************************************************************************
 if requestId_check:
-    import requests
 
     # Event numbers as a list
     event_list = [
@@ -72,11 +93,10 @@ if requestId_check:
 
     valid_requests = set()
     for event_number in event_list:
-        # We will download a file containing the day list for an event
-        url = "http://trecis.org/CrisisFACTs/CrisisFACTS-"+event_number+".requests.json"
+        file_loc = Path(args.files) / f'CrisisFACTS-{event_number}.requests.json'
 
-        # Download the list and parse as JSON
-        this_event = requests.get(url).json()
+        # Read in the list and parse as JSON
+        this_event = json.load(open(file_loc, 'r'))
         for day in this_event:
             valid_requests.add(day["requestID"])
 
