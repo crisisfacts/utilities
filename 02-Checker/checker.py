@@ -2,25 +2,10 @@
 
 import sys
 import json
+
 import logging
 import argparse
 from pathlib import Path
-
-ap = argparse.ArgumentParser(description='Check a CrisisFACTs run for correctness.',
-                             formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-ap.add_argument('--files', '-f',
-                help='Location of requests files',
-                default='/runs/aux/crisis')
-ap.add_argument('--no_reqid_check',
-                action='store_false',
-                help='Should we skip the requestID check? (default: no)')
-ap.add_argument('runfile',
-                help='Run file to check')
-args = ap.parse_args()
-
-# Configure which checks to run
-#  NOTE: Format checking always happens
-requestId_check = args.no_reqid_check
 
 logging.basicConfig(filename=f'{args.runfile}.errlog',
                     level=logging.DEBUG)
@@ -35,8 +20,56 @@ def excepthook(exctype, value, traceback):
 
 sys.excepthook = excepthook
 
-in_file_path = args.runfile
+arg_parse = argparse.ArgumentParser(
+    prog='checker.py',
+    description='CrisisFACTS Submission File Checker',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+arg_parse.add_argument('--files', '-f',
+                       help='Location of requests files',
+                       default='/runs/aux/crisis')
+arg_parse.add_argument(
+    "--disable", 
+    type=str, 
+    choices=["requestIds", "importance", "queries", "sources"],
+    default="",
+    nargs='+',
+    help="Which checks to disable"
+)
+arg_parse.add_argument('filename',
+                help='Run file to check')
+arguments = arg_parse.parse_args()
+
+print("Format checking:", "enabled")
+
+requestId_check = True
+if "requestIds" in arguments.disable:
+    requestId_check = False
+print("Request ID checking:", "enabled" if requestId_check else "disabled")
+
+
+importance_check = True
+if "importance" in arguments.disable:
+    importance_check = False
+print("Importance checking:", "enabled" if importance_check else "disabled")
+
+
+info_need_check = True
+if "queries" in arguments.disable:
+    info_need_check = False
+print("Query checking:", "enabled" if info_need_check else "disabled")
+
+
+sources_check = True
+if "sources" in arguments.disable:
+    sources_check = False
+print("Source checking:", "enabled" if sources_check else "disabled")
+
+
+# Get the file to check
+in_file_path = arguments.filename
 print("Checking file: [%s]" % in_file_path)
+
+
 
 
 # Reach in our submission file
@@ -88,7 +121,17 @@ if requestId_check:
         "005", # 2018 Maryland Flood
         "006", # Saddleridge Wildfire 2019
         "007", # Hurricane Laura 2020
-        "008" # Hurricane Sally 2020
+        "008", # Hurricane Sally 2020
+        "009", # Beirut Explosion, 2020
+        "010", # Houston Explosion, 2020
+        "011", # Rutherford TN Floods, 2020
+        "012", # TN Derecho, 2020
+        "013", # Edenville Dam Fail, 2020
+        "014", # Hurricane Dorian, 2019
+        "015", # Kincade Wildfire, 2019
+        "016", # Easter Tornado Outbreak, 2020
+        "017", # Tornado Outbreak, 2020 Apr
+        "018", # Tornado Outbreak, 2020 March
     ]
 
     valid_requests = set()
@@ -109,14 +152,137 @@ if requestId_check:
         found_requests.add(element["requestID"])
 
     missing_requests = valid_requests.difference(found_requests)
-    assert len(missing_requests) == 0, "ERROR: Submission file is missing responses for the following requests: " + ",".join(missing_requests)
+    if len(missing_requests) > 0:
+        print("Your submission is missing data for:")
+        for missing_element in missing_requests:
+            print("\t", missing_element)
+
+        entered = input("\nIs this acceptable? [Y/n] ")
+        assert entered.lower() == "y", "ERROR: Can't continue without user agreement"
+
 
     print("RequestID Check: Pass")
 
+# *****************************************************************************
+# Validate importance is a reasonable value
+# *****************************************************************************
+if importance_check:
+    # Iterate through all elements in the submission, and ensure importance values numeric and in [0,1]
+    for line_num, element in enumerate(checkable_data):
+        assert element["importance"] >= 0 and element["importance"] <= 1, "ERROR Line [%d]: Invalid importance value, outside acceptable range [%f]" % (line_num, element["importance"])
+
+    print("Importance Check: Pass")
 
 
-# TODO: Validate importance is reasonable
-# TODO: Validate elements in sources and information needs are reasonable
+# *****************************************************************************
+# Validate information needs come from the known list
+# *****************************************************************************
+if info_need_check:
+    query_set = {
+        "CrisisFACTS-General-q001",
+        "CrisisFACTS-General-q002",
+        "CrisisFACTS-General-q003",
+        "CrisisFACTS-General-q004",
+        "CrisisFACTS-General-q005",
+        "CrisisFACTS-General-q006",
+        "CrisisFACTS-General-q007",
+        "CrisisFACTS-General-q008",
+        "CrisisFACTS-General-q009",
+        "CrisisFACTS-General-q010",
+        "CrisisFACTS-General-q011",
+        "CrisisFACTS-General-q012",
+        "CrisisFACTS-General-q013",
+        "CrisisFACTS-General-q014",
+        "CrisisFACTS-General-q015",
+        "CrisisFACTS-General-q016",
+        "CrisisFACTS-General-q017",
+        "CrisisFACTS-General-q018",
+        "CrisisFACTS-General-q019",
+        "CrisisFACTS-General-q020",
+        "CrisisFACTS-General-q021",
+        "CrisisFACTS-General-q022",
+        "CrisisFACTS-General-q023",
+        "CrisisFACTS-General-q024",
+        "CrisisFACTS-General-q025",
+        "CrisisFACTS-General-q026",
+        "CrisisFACTS-General-q027",
+        "CrisisFACTS-General-q028",
+        "CrisisFACTS-General-q029",
+        "CrisisFACTS-General-q030",
+        "CrisisFACTS-General-q031",
+        "CrisisFACTS-General-q032",
+        "CrisisFACTS-General-q033",
+        "CrisisFACTS-General-q034",
+        "CrisisFACTS-General-q035",
+        "CrisisFACTS-General-q036",
+        "CrisisFACTS-General-q037",
+        "CrisisFACTS-General-q038",
+        "CrisisFACTS-General-q039",
+        "CrisisFACTS-General-q040",
+        "CrisisFACTS-General-q041",
+        "CrisisFACTS-General-q042",
+        "CrisisFACTS-General-q043",
+        "CrisisFACTS-General-q044",
+        "CrisisFACTS-General-q045",
+        "CrisisFACTS-General-q046",
+        "CrisisFACTS-Accident-q001",
+        "CrisisFACTS-Accident-q002",
+        "CrisisFACTS-Accident-q003",
+        "CrisisFACTS-Accident-q004",
+        "CrisisFACTS-Accident-q005",
+        "CrisisFACTS-Accident-q006",
+        "CrisisFACTS-Accident-q007",
+        "CrisisFACTS-Accident-q008",
+        "CrisisFACTS-Accident-q009",
+        "CrisisFACTS-Accident-q010",
+        "CrisisFACTS-Flood-q001",
+        "CrisisFACTS-Flood-q002",
+        "CrisisFACTS-Hurricane-q001",
+        "CrisisFACTS-Hurricane-q002",
+        "CrisisFACTS-Hurricane-q003",
+        "CrisisFACTS-Hurricane-q004",
+        "CrisisFACTS-Hurricane-q06",
+        "CrisisFACTS-Storm-q001",
+        "CrisisFACTS-Storm-q002",
+        "CrisisFACTS-Storm-q003",
+        "CrisisFACTS-Tornado-q001",
+        "CrisisFACTS-Tornado-q002",
+        "CrisisFACTS-Tornado-q003",
+        "CrisisFACTS-Tornado-q004",
+        "CrisisFACTS-Tornado-q005",
+        "CrisisFACTS-Wildfire-q001",
+        "CrisisFACTS-Wildfire-q002",
+        "CrisisFACTS-Wildfire-q003",
+        "CrisisFACTS-Wildfire-q004",
+        "CrisisFACTS-Wildfire-q005",
+        "CrisisFACTS-Wildfire-q006",
+    }
 
+    # Iterate through all elements in the submission, and ensure informationNeeds comes from the list of valid queries
+    for line_num, element in enumerate(checkable_data):
+        # element["informationNeeds"] is optional so could be omitted or empty
+        if "informationNeeds" not in element or len(element["informationNeeds"]) == 0:
+            continue
+
+        unknown_quries = set(element["informationNeeds"]).difference(query_set)
+        assert len(unknown_quries) == 0, "ERROR: Unknown query in information needs field: [%s]" % ",".join(unknown_quries)
+
+    print("Query Check: Pass")
+
+# *****************************************************************************
+# Validate sources  is a reasonable value
+# *****************************************************************************
+if sources_check:
+    import re
+
+    source_format_tfn = re.compile("CrisisFACTS-[0-9]+-(Twitter|Facebook|News)-[0-9]+-[0-9]+")
+    source_format_reddit = re.compile("CrisisFACTS-[0-9]+-Reddit-s?[0-9]+-([0-9]+|c?[0-9]+-[0-9]+)")
+    
+    # Iterate through all elements in the submission, and ensure sources conform to the appropriate format
+    for line_num, element in enumerate(checkable_data):
+        for source in element["sources"]:
+            assert source_format_tfn.match(source) or source_format_reddit.match(source), "ERROR Line [%d]: Invalid source [%s]" % (line_num, source)
+
+    print("Sources Check: Pass")
 
 print("Success! Passed all tests.")
