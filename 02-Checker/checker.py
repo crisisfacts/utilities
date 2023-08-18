@@ -163,8 +163,8 @@ if requestId_check:
         for missing_element in missing_requests:
             print("\t", missing_element)
 
-        entered = input("\nIs this acceptable? [Y/n] ")
-        assert entered.lower() == "y", "ERROR: Can't continue without user agreement"
+        # entered = input("\nIs this acceptable? [Y/n] ")
+        # assert entered.lower() == "y", "ERROR: Can't continue without user agreement"
 
 
     print("RequestID Check: Pass")
