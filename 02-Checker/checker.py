@@ -7,7 +7,26 @@ import logging
 import argparse
 from pathlib import Path
 
-logging.basicConfig(filename=f'{args.runfile}.errlog',
+arg_parse = argparse.ArgumentParser(
+    prog='checker.py',
+    description='CrisisFACTS Submission File Checker',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+arg_parse.add_argument('--files', '-f',
+                       help='Location of requests files',
+                       default='/runs/aux/crisis')
+arg_parse.add_argument(
+    "--disable",
+    type=str,
+    choices=["requestIds", "importance", "queries", "sources"],
+    default="",
+    nargs='+',
+    help="Which checks to disable"
+)
+arg_parse.add_argument('filename',
+                help='Run file to check')
+arguments = arg_parse.parse_args()
+
+logging.basicConfig(filename=f'{arguments.filename}.errlog',
                     level=logging.DEBUG)
 
 # Catch assertion failures and log them to the errlog
@@ -19,25 +38,6 @@ def excepthook(exctype, value, traceback):
         sys.__excepthook__(exctype, value, traceback)
 
 sys.excepthook = excepthook
-
-arg_parse = argparse.ArgumentParser(
-    prog='checker.py',
-    description='CrisisFACTS Submission File Checker',
-    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-arg_parse.add_argument('--files', '-f',
-                       help='Location of requests files',
-                       default='/runs/aux/crisis')
-arg_parse.add_argument(
-    "--disable", 
-    type=str, 
-    choices=["requestIds", "importance", "queries", "sources"],
-    default="",
-    nargs='+',
-    help="Which checks to disable"
-)
-arg_parse.add_argument('filename',
-                help='Run file to check')
-arguments = arg_parse.parse_args()
 
 print("Format checking:", "enabled")
 
@@ -136,7 +136,7 @@ if requestId_check:
 
     valid_requests = set()
     for event_number in event_list:
-        file_loc = Path(args.files) / f'CrisisFACTS-{event_number}.requests.json'
+        file_loc = Path(arguments.files) / f'CrisisFACTS-{event_number}.requests.json'
 
         # Read in the list and parse as JSON
         this_event = json.load(open(file_loc, 'r'))
